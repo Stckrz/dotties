@@ -1,14 +1,13 @@
-(defwidget workspacebar []
-	(box :orientation "v"
-		(workspaces)
-	)
-)
-
 (defwidget sidestuff []
-  (box :class "sidestuff" :orientation "h" :space-evenly true :halign "end"
-    (metric :label "🔊"
+  (box :class "sidestuff" :orientation "h" 
+    :space-evenly false
+    :halign "end"
+    (metric :label ""
             :value volume
             :onchange "amixer sset 'Master' {}%")
+    (metric :label ""
+            :value battery
+            :onchange "")
     (metric :label "󰍛"
             :value {EWW_RAM.used_mem_perc}
             :onchange "")
@@ -18,7 +17,14 @@
     (metric :label ""
             :value {EWW_CPU.avg}
             :onchange "")
-    time))
+    time
+
+  (box :class "widgetbutton"
+      :space-evenly false
+      :valign "center"
+      :halign "center"
+    (button :onclick "eww open power" "󰐥"))
+  ))
 
 (defwidget workspaces []
   (box :class "workspaces"
@@ -38,10 +44,10 @@
     ))
 
 (defwidget metric [label value onchange]
-  (box :orientation "v"
+  (box :orientation "h"
        :class "metric"
        :space-evenly true
-      :valign: "center"
+      ;; :valign: "start"
     (box :class "label" label)
     (scale :min 0
            :max 101
@@ -49,6 +55,18 @@
            :value value
            :onchange onchange)))
 
+(defwidget widgetbutton [label value onclick]
+  (box :orientation "v"
+      :class "widgetbutton"
+      :space-evenly true
+      :valign: "center"
+    (box :class "label" label)
+  )
+)
+
+(defwidget maybes []
+(literal :content maybe)
+)
 
 
 
@@ -59,38 +77,94 @@
 (defpoll time :interval "10s"
   "date '+%I:%M %p %b %d, %Y'")
 
+(defpoll battery :interval "1s"
+  "scripts/getvol"
+)
+
 ;;returns which workspace is the active workspace
-(defpoll active_workspace :interval "1s"
+(defpoll active_workspace :interval "0.5s"
 	"hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\\s)(\\d+)'")
+(defpoll maybescript :interval "0.5s"
+  "scripts/maybe"
+)
+
+(defpoll workspaces_with_content :interval "1s"
+	"hyprctl -j workspaces | grep -oP '(?<=\"id\":\\s)(\\d+)'")
+
+(deflisten maybe
+  "scripts/maybe"
+)
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Windows;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defwindow bar
   :stacking "bg"
   :exclusive true
-  :monitor 1
+  :monitor 0
   :windowtype "dock"
-  :geometry (geometry :x "0%"
-                      :y "0%"
-                      :width: "100%"
-                      :height "50px"
-                      :anchor "top center")
+  :geometry (geometry 
+                  :x "0%"
+                  :y "0%"
+                  :width "100%"
+                  :height "35px"
+                  :anchor "top center")
   :reserve (struts :side "top" :distance "4%")
-  (box
-		(workspacebar)
-        (sidestuff))
+  (box :class "assbox" 
+    (maybes)
+    (sidestuff)
+    
   )
+)
 
-(defwindow dummy
-		:monitor 1
-		:exclusive false
-		:windowtype "toolbar"
-		:geometry (geometry
-			:x "0%"
-			:y "0%"
-			:width "20%"
-			:height "1%"
-			:anchor "top right")
-	:reserve (struts :side "top" :distance "4%")
-	:windowtype "dock"
-	(sidestuff))
+(defwindow homebase
+  :stacking "fg"
+  :monitor 0
+  :exclusive false
+  :windowtipe "dock"
+  :geometry (geometry
+    :x "0%"
+    :y "0%"
+    :width "100%"
+    :height "100%"
+    :anchor "center")
+(homebasebox)
+)
+(defwidget homebasebox []
+  (box :class "homebasebox"
+    :orientation "v"
+    :spacing 15
+    :space-evenly true
+    :spacing 10
+    (powerbuttonbox)
+    (powerbuttonbox)
+  )
+)
 
+(defwindow power
+  :monitor 0
+  :exclusive false
+  :windowtype "dock"
+  :geometry (geometry
+    :x "0%"
+    :y "0%"
+    :width "100%"
+    :height "100%"
+    :anchor "center")
+  (box
+  (powerbuttonbox)
+  )
+)
+
+(defwidget powerbuttonbox [] 
+  (box :class "powerbuttonbox" 
+    :orientation "v"
+    :spacing 15
+      :space-evenly true
+      :spacing 10
+    (button :class "widgetbutton" :onclick "reboot" "reboot")
+    (button :class "widgetbutton" "log out")
+    (button :class "widgetbutton" :onclick "shutdown now" "shutdown")
+    (button :class "widgetbutton" :onclick "eww close power" "exit")
+  )
+)
