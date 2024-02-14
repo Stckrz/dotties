@@ -1,3 +1,25 @@
+(defpoll volume :interval "1s"
+  "scripts/getvol")
+
+(defpoll time :interval "10s"
+  "date '+%I:%M %p %b %d, %Y'")
+
+(defpoll battery :interval "1s"
+  "scripts/getvol")
+
+
+;;returns which workspace is the active workspace
+(defpoll active_workspace :interval "0.5s"
+  "hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\\s)(\\d+)'")
+
+(defpoll workspaces_with_content :interval "1s"
+  "hyprctl -j workspaces | grep -oP '(?<=\"id\":\\s)(\\d+)'")
+
+(deflisten workspace
+  "scripts/getworkspace")
+
+
+
 (defwidget sidestuff []
   (box :class "sidestuff" :orientation "h" 
     :space-evenly false
@@ -5,49 +27,28 @@
     (metric :label ""
             :value volume
             :onchange "amixer sset 'Master' {}%")
-    (metric :label ""
-            :value battery
-            :onchange "")
+    ;; (metric :label ""
+    ;;         :value battery
+    ;;         :onchange "")
     (metric :label "󰍛"
             :value {EWW_RAM.used_mem_perc}
             :onchange "")
-    ;; (metric :label "💾"
-    ;;         :value {round((1 - (EWW_DISK["/"].free / EWW_DISK["/"].total)) * 100, 0)}
-    ;;         :onchange "")
     (metric :label ""
             :value {EWW_CPU.avg}
             :onchange "")
     time
 
-  (box :class "widgetbutton"
-      :space-evenly false
-      :valign "center"
-      :halign "center"
-    (button :onclick "eww open power" "󰐥"))
-  ))
-
-(defwidget workspaces []
-  (box :class "workspaces"
-       :orientation "h"
-       :space-evenly true
-       :halign "start"
-       :spacing 10
-    (button :class {active_workspace == 1 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 1" )
-    (button :class {active_workspace == 2 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 2" )
-    (button :class {active_workspace == 3 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 3" )
-    (button :class {active_workspace == 4 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 4" )
-    (button :class {active_workspace == 5 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 5" )
-    (button :class {active_workspace == 6 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 6" )
-    (button :class {active_workspace == 7 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 7" )
-    (button :class {active_workspace == 8 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 8" )
-    (button :class {active_workspace == 9 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 9" )
-    ))
+   (box :class "widgetbutton"
+       :space-evenly false
+       :valign "center"
+       :halign "center"
+     (button :onclick "eww open power" "󰐥"))))
+  
 
 (defwidget metric [label value onchange]
   (box :orientation "h"
        :class "metric"
        :space-evenly true
-      ;; :valign: "start"
     (box :class "label" label)
     (scale :min 0
            :max 101
@@ -60,62 +61,33 @@
       :class "widgetbutton"
       :space-evenly true
       :valign: "center"
-    (box :class "label" label)
-  )
-)
-
-(defwidget maybes []
-(literal :content maybe)
-)
+    (box :class "label" label)))
+  
 
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;variables;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defpoll volume :interval "1s"
-  "scripts/getvol")
-
-(defpoll time :interval "10s"
-  "date '+%I:%M %p %b %d, %Y'")
-
-(defpoll battery :interval "1s"
-  "scripts/getvol"
-)
-
-;;returns which workspace is the active workspace
-(defpoll active_workspace :interval "0.5s"
-	"hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\\s)(\\d+)'")
-(defpoll maybescript :interval "0.5s"
-  "scripts/maybe"
-)
-
-(defpoll workspaces_with_content :interval "1s"
-	"hyprctl -j workspaces | grep -oP '(?<=\"id\":\\s)(\\d+)'")
-
-(deflisten maybe
-  "scripts/maybe"
-)
+(defwidget workspaces []
+ (literal :content workspace))
 
 
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Windows;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defwindow bar
   :stacking "bg"
   :exclusive true
-  :monitor 0
+  :monitor 1
   :windowtype "dock"
   :geometry (geometry 
                   :x "0%"
                   :y "0%"
-                  :width "100%"
+                  :width "95%"
                   :height "35px"
                   :anchor "top center")
   :reserve (struts :side "top" :distance "4%")
   (box :class "assbox" 
-    (maybes)
-    (sidestuff)
+    (workspaces)
+    (sidestuff)))
     
-  )
-)
+  
+
 
 (defwindow homebase
   :stacking "fg"
@@ -123,13 +95,13 @@
   :exclusive false
   :windowtipe "dock"
   :geometry (geometry
-    :x "0%"
-    :y "0%"
-    :width "100%"
-    :height "100%"
-    :anchor "center")
-(homebasebox)
-)
+             :x "0%"
+             :y "0%"
+             :width "100%"
+             :height "100%"
+             :anchor "center")
+ (homebasebox))
+
 (defwidget homebasebox []
   (box :class "homebasebox"
     :orientation "v"
@@ -137,24 +109,24 @@
     :space-evenly true
     :spacing 10
     (powerbuttonbox)
-    (powerbuttonbox)
-  )
-)
+    (powerbuttonbox)))
+  
+
 
 (defwindow power
-  :monitor 0
+  :monitor 1
   :exclusive false
   :windowtype "dock"
   :geometry (geometry
-    :x "0%"
-    :y "0%"
-    :width "100%"
-    :height "100%"
-    :anchor "center")
+             :x "0%"
+             :y "0%"
+             :width "100%"
+             :height "100%"
+             :anchor "center")
   (box
-  (powerbuttonbox)
-  )
-)
+   (powerbuttonbox)))
+  
+
 
 (defwidget powerbuttonbox [] 
   (box :class "powerbuttonbox" 
@@ -165,6 +137,4 @@
     (button :class "widgetbutton" :onclick "reboot" "reboot")
     (button :class "widgetbutton" "log out")
     (button :class "widgetbutton" :onclick "shutdown now" "shutdown")
-    (button :class "widgetbutton" :onclick "eww close power" "exit")
-  )
-)
+    (button :class "widgetbutton" :onclick "eww close power" "exit")))

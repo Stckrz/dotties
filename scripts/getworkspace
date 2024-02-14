@@ -1,0 +1,37 @@
+workspaces() {
+un='o'
+
+f1=$(hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\s)(1)')
+f2=$(hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\s)(2)')
+f3=$(hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\s)(3)')
+f4=$(hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\s)(4)')
+f5=$(hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\s)(5)')
+f6=$(hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\s)(6)')
+f7=$(hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\s)(7)')
+f8=$(hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\s)(8)')
+f9=$(hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\s)(9)')
+
+
+o1=$(hyprctl -j workspaces | grep -oP '(?<=\"id\":\s)(1)')
+o2=$(hyprctl -j workspaces | grep -oP '(?<=\"id\":\s)(2)')
+o3=$(hyprctl -j workspaces | grep -oP '(?<=\"id\":\s)(3)')
+o4=$(hyprctl -j workspaces | grep -oP '(?<=\"id\":\s)(4)')
+o5=$(hyprctl -j workspaces | grep -oP '(?<=\"id\":\s)(5)')
+o6=$(hyprctl -j workspaces | grep -oP '(?<=\"id\":\s)(6)')
+o7=$(hyprctl -j workspaces | grep -oP '(?<=\"id\":\s)(7)')
+o8=$(hyprctl -j workspaces | grep -oP '(?<=\"id\":\s)(8)')
+o9=$(hyprctl -j workspaces | grep -oP '(?<=\"id\":\s)(9)')
+
+echo "(box :class 'workspaces' :orientation 'h' :halign 'start' :spacing 10 \
+(button :class '$un$f1$o1' :onclick 'hyprctl dispatch workspace 1' '')\
+(button :class '$un$f2$o2' :onclick 'hyprctl dispatch workspace 2' '')\
+(button :class '$un$f3$o3' :onclick 'hyprctl dispatch workspace 3' '')\
+(button :class '$un$f4$o4' :onclick 'hyprctl dispatch workspace 4' '')\
+(button :class '$un$f5$o5' :onclick 'hyprctl dispatch workspace 5' '')\
+(button :class '$un$f6$o6' :onclick 'hyprctl dispatch workspace 6' '')\
+(button :class '$un$f7$o7' :onclick 'hyprctl dispatch workspace 7' '')\
+(button :class '$un$f8$o8' :onclick 'hyprctl dispatch workspace 8' '')\
+(button :class '$un$f9$o9' :onclick 'hyprctl dispatch workspace 9' ''))"
+}
+workspaces
+while sleep 0.25; do workspaces; done

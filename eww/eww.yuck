@@ -1,0 +1,96 @@
+(defwidget workspacebar []
+	(box :orientation "v"
+		(workspaces)
+	)
+)
+
+(defwidget sidestuff []
+  (box :class "sidestuff" :orientation "h" :space-evenly true :halign "end"
+    (metric :label "🔊"
+            :value volume
+            :onchange "amixer sset 'Master' {}%")
+    (metric :label "󰍛"
+            :value {EWW_RAM.used_mem_perc}
+            :onchange "")
+    ;; (metric :label "💾"
+    ;;         :value {round((1 - (EWW_DISK["/"].free / EWW_DISK["/"].total)) * 100, 0)}
+    ;;         :onchange "")
+    (metric :label ""
+            :value {EWW_CPU.avg}
+            :onchange "")
+    time))
+
+(defwidget workspaces []
+  (box :class "workspaces"
+       :orientation "h"
+       :space-evenly true
+       :halign "start"
+       :spacing 10
+    (button :class {active_workspace == 1 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 1" )
+    (button :class {active_workspace == 2 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 2" )
+    (button :class {active_workspace == 3 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 3" )
+    (button :class {active_workspace == 4 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 4" )
+    (button :class {active_workspace == 5 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 5" )
+    (button :class {active_workspace == 6 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 6" )
+    (button :class {active_workspace == 7 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 7" )
+    (button :class {active_workspace == 8 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 8" )
+    (button :class {active_workspace == 9 ? "active" : "inactive"} :onclick "hyprctl dispatch workspace 9" )
+    ))
+
+(defwidget metric [label value onchange]
+  (box :orientation "v"
+       :class "metric"
+       :space-evenly true
+      :valign: "center"
+    (box :class "label" label)
+    (scale :min 0
+           :max 101
+           :active {onchange != ""}
+           :value value
+           :onchange onchange)))
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;variables;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defpoll volume :interval "1s"
+  "scripts/getvol")
+
+(defpoll time :interval "10s"
+  "date '+%I:%M %p %b %d, %Y'")
+
+;;returns which workspace is the active workspace
+(defpoll active_workspace :interval "1s"
+	"hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\\s)(\\d+)'")
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Windows;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defwindow bar
+  :stacking "bg"
+  :exclusive true
+  :monitor 1
+  :windowtype "dock"
+  :geometry (geometry :x "0%"
+                      :y "0%"
+                      :width: "100%"
+                      :height "50px"
+                      :anchor "top center")
+  :reserve (struts :side "top" :distance "4%")
+  (box
+		(workspacebar)
+        (sidestuff))
+  )
+
+(defwindow dummy
+		:monitor 1
+		:exclusive false
+		:windowtype "toolbar"
+		:geometry (geometry
+			:x "0%"
+			:y "0%"
+			:width "20%"
+			:height "1%"
+			:anchor "top right")
+	:reserve (struts :side "top" :distance "4%")
+	:windowtype "dock"
+	(sidestuff))
+
