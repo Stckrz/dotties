@@ -1,48 +1,89 @@
 (defpoll volume :interval "1s"
   "scripts/getvol")
 
-(defpoll time :interval "10s"
-  "date '+%I:%M %p %b %d, %Y'")
-
 (defpoll battery :interval "1s"
   "scripts/getvol")
 
-
-;;returns which workspace is the active workspace
-(defpoll active_workspace :interval "0.5s"
-  "hyprctl -j activeworkspace | grep -oP '(?<=\"id\":\\s)(\\d+)'")
-
-(defpoll workspaces_with_content :interval "1s"
-  "hyprctl -j workspaces | grep -oP '(?<=\"id\":\\s)(\\d+)'")
+(defpoll hour :interval "1m"
+  "date \"+%H\""
+  )
+(defpoll minute :interval "10s"
+  "date \"+%M\""
+  )
 
 (deflisten workspace
   "scripts/getworkspace")
 
 
+(defwidget volume_slider []
+  (box :orientation "h" 
+       :class "metric volume" 
+       :space-evenly true 
+    (box :class "label volume" "")
+    ;; (box volume)
+    (scale 
+      :min 0 
+      :max 101 
+      :value volume 
+      :onchange "amixer sset 'Master' {}%"
+    )
+  )
+)
+
+(defwidget cpu_info []
+  (box :orientation "h" 
+       :class "metric cpu" 
+       :space-evenly true 
+    (box :class "label cpu" "")
+    (box {round(EWW_CPU.avg, 0)}"%")
+
+  )
+)
+
+(defwidget memory_info []
+  (box :orientation "h" 
+       :class "metric ram" 
+       :space-evenly true 
+    (box :class "label ram" "")
+    (box {round(EWW_RAM.used_mem_perc, 0)} "%")
+
+  )
+)
+
+(defwidget time []
+  (box :orientation "h" 
+       :class "metric time" 
+       :spacing 0
+       :space-evenly true 
+    (box :space-evenly false
+      (box :class "label clock" "󰥔")
+      (box  hour)
+      (box  ":")
+      (box minute)
+    )
+  )
+)
 
 (defwidget sidestuff []
   (box :class "sidestuff" :orientation "h" 
     :space-evenly false
     :halign "end"
-    (metric :label ""
-            :value volume
-            :onchange "amixer sset 'Master' {}%")
+    (volume_slider)
+    (cpu_info)
+    (memory_info)
+    (time)
+
     ;; (metric :label ""
     ;;         :value battery
     ;;         :onchange "")
-    (metric :label "󰍛"
-            :value {EWW_RAM.used_mem_perc}
-            :onchange "")
-    (metric :label ""
-            :value {EWW_CPU.avg}
-            :onchange "")
-    time
 
    (box :class "widgetbutton"
        :space-evenly false
        :valign "center"
        :halign "center"
-     (button :onclick "eww open power" "󰐥"))))
+     (button :class "powerbutton" :onclick "eww open power" "󰐥")
+     ))
+)
   
 
 (defwidget metric [label value onchange]
@@ -55,6 +96,9 @@
            :active {onchange != ""}
            :value value
            :onchange onchange)))
+
+  
+  
 
 (defwidget widgetbutton [label value onclick]
   (box :orientation "v"

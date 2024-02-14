@@ -1,6 +1,6 @@
 
-$main-color: black;
-$secondary-color: grey;
+$secondary-color: black;
+$main-color: #20242D;
 
 * {
   all: unset; //Unsets everything so you can style everything from scratch
@@ -8,84 +8,107 @@ $secondary-color: grey;
 
 //Global Styles
 .bar {
-  margin-top: 5px;
+	margin-top: 5px;
 }
 
 // Styles on classes (see eww.yuck for more information)
 .sidestuff {
-	color: $main-color;
+	color: $secondary-color;
+	background-color: $main-color;
+	border: 4px solid black;
+	border-radius: 15px;
 	font-size: 23px;
-	font-weight: bold;
 	padding: 1px;
 	padding-left: 5px;
 	padding-right: 5px;
 }
 
 .sidestuff slider {
-  all: unset;
-  color: #ffd5cd;
+	all: unset;
+	color: #ffd5cd;
 }
 
 .metric{
-	font-size: 25px;
-	padding-left: 10px;
-	padding-right: 10px;
+	font-size: 20px;
+	font-weight: bold;
+	padding-left: 5px;
+	padding-right: 5px;
+	color: black;
+}
+.volume {
+	color: #C6A0F6;
+}
+.cpu {
+	color: #EE99A0;
+}
+.ram {
+	color: #EED49F;
+}
+.time{
+	color: #F5BDE6;
+}
+.clock{
+	padding-right: 15px;
+	padding-left: 15px;
+}
+
+.powerbutton{
+	color: #F4DBD6;
 }
 
 .metric scale trough highlight {
-  all: unset;
-  background-color: black;
-  color: #000000;
+	all: unset;
+	background-color: #C6A0F6;
+	color: #000000;
 }
 
 .metric scale trough {
-  all: unset;
-  background-color: $secondary-color;
-  min-height: 3px;
-  min-width: 50px;
+	all: unset;
+	background-color: white;
+	min-height: 3px;
+	min-width: 40px;
 }
 
 .label-ram {
-  font-size: large;
+	font-size: small;
 }
 .workspaces button:hover {
-  background-color: $secondary-color;
-  box-shadow: 0px 0px 3px $secondary-color;
-  transition: all 1s;
+	background-color: $main-color;
+	box-shadow: 0px 0px 3px $main-color;
+	transition: all 1s;
 }
 .workspaces{
-	padding: 8px;
-	padding-left: 2px;
-	padding-right: 2px;
-	// border: 3px solid $main-color;
-	// background-color: $main-color;
-	border-radius: 2px;
+	padding: 6px;
+	border: 4px solid $secondary-color;
+	background-color: $main-color;
+	border-radius: 10px;
 }
 
 .o1, .o2, .o3, .o4, .o5, .o6, .o7, .o8, .o9, .o11, .o22, .o33, .o44, .o55, .o66, .o77, .o88, .o99{
 	padding-right: 0px;
-	// padding-left: 18px;
-	background-color: $main-color;
-	border-radius: 2px;
+	border-radius: 3px;
 }
 .o{
 	// border: 1px solid $secondary-color;
-	padding-right: 9px;
-	padding-left: 9px;
-	background-color: $main-color;
+	padding-right: 13px;
+	padding-left: 13px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border-radius: 3px;
+	border: 2px solid #494d64;
 
 }
 .o1, .o2, .o3, .o4, .o5, .o6, .o7, .o8, .o9{
-	background-color: $main-color;
-	box-shadow: 0px 0px 2px 2px white;
-	border-radius: 2px;
+	box-shadow: 0px 0px 1px 1px #CAD3F5;
+	border: 1px solid #494d64;
+	border-radius: 3px;
 	
 }
 .o11, .o22, .o33, .o44, .o55, .o66, .o77, .o88, .o99{
-	background-color: $secondary-color;
-	box-shadow: 0px 0px 2px 1px $secondary-color;
-	background-color: white;
-	border-radius: 2px;
+	background-color: #a5adcb;
+	border: 1px solid #a5adcb;
+	box-shadow: inset 0px 0px 1px 2px black;
+	border-radius: 3px;
 }
 
 .power{
@@ -95,7 +118,6 @@ $secondary-color: grey;
 }
 .widgetbutton{
 	font-size: 30px;
-	// background-color: $secondary-color;
 	color: black;
 	margin-left: 4px;
 	padding-left: 10px;
@@ -118,8 +140,3 @@ $secondary-color: grey;
 	padding-right: 400px;
 }
 
-.ass{
-	background-color: red;
-	min-width: 100px;
-	min-height: 100px;
-}
