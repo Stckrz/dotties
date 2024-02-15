@@ -1,18 +1,22 @@
 (defpoll volume :interval "1s"
-  "scripts/getvol")
+  "scripts/getvol"
+)
 
 (defpoll battery :interval "1s"
-  "scripts/getvol")
+  "scripts/getvol"
+)
 
 (defpoll hour :interval "1m"
   "date \"+%H\""
-  )
+)
+
 (defpoll minute :interval "10s"
   "date \"+%M\""
-  )
+)
 
 (deflisten workspace
-  "scripts/getworkspace")
+  "scripts/getworkspace"
+)
 
 
 (defwidget volume_slider []
@@ -20,7 +24,6 @@
        :class "metric volume" 
        :space-evenly true 
     (box :class "label volume" "")
-    ;; (box volume)
     (scale 
       :min 0 
       :max 101 
@@ -46,7 +49,15 @@
        :space-evenly true 
     (box :class "label ram" "")
     (box {round(EWW_RAM.used_mem_perc, 0)} "%")
+  )
+)
 
+(defwidget battery_info []
+  (box :orientation "h" 
+       :class "metric battery" 
+       :space-evenly true 
+    (box :class "label battery" "")
+    (box battery)
   )
 )
 
@@ -68,56 +79,39 @@
   (box :class "sidestuff" :orientation "h" 
     :space-evenly false
     :halign "end"
+    (battery_info)
     (volume_slider)
     (cpu_info)
     (memory_info)
     (time)
-
-    ;; (metric :label ""
-    ;;         :value battery
-    ;;         :onchange "")
 
    (box :class "widgetbutton"
        :space-evenly false
        :valign "center"
        :halign "center"
      (button :class "powerbutton" :onclick "eww open power" "󰐥")
-     ))
+   )
+  )
 )
-  
-
-(defwidget metric [label value onchange]
-  (box :orientation "h"
-       :class "metric"
-       :space-evenly true
-    (box :class "label" label)
-    (scale :min 0
-           :max 101
-           :active {onchange != ""}
-           :value value
-           :onchange onchange)))
-
-  
-  
 
 (defwidget widgetbutton [label value onclick]
   (box :orientation "v"
       :class "widgetbutton"
       :space-evenly true
       :valign: "center"
-    (box :class "label" label)))
+    (box :class "label" label)
+  )
+)
   
-
-
 (defwidget workspaces []
- (literal :content workspace))
-
+ (literal :content workspace)
+)
 
 
 (defwindow bar
   :stacking "bg"
   :exclusive true
-  :monitor 1
+  :monitor 0
   :windowtype "dock"
   :geometry (geometry 
                   :x "0%"
@@ -128,23 +122,33 @@
   :reserve (struts :side "top" :distance "4%")
   (box :class "assbox" 
     (workspaces)
-    (sidestuff)))
+    (sidestuff)
+  )
+)
     
   
 
 
 (defwindow homebase
   :stacking "fg"
+  :class "homebase"
   :monitor 0
   :exclusive false
   :windowtipe "dock"
+  :spacing 10
   :geometry (geometry
              :x "0%"
              :y "0%"
-             :width "100%"
-             :height "100%"
+             :width "6%"
+             :height "10%"
              :anchor "center")
- (homebasebox))
+  (box :spacing 20 :class "assbox"
+    (box  :class "ass" "")
+    (box "")
+    (box "")
+    (box "")
+  )
+)
 
 (defwidget homebasebox []
   (box :class "homebasebox"
@@ -152,8 +156,9 @@
     :spacing 15
     :space-evenly true
     :spacing 10
-    (powerbuttonbox)
-    (powerbuttonbox)))
+    )
+  
+)
   
 
 
@@ -168,10 +173,10 @@
              :height "100%"
              :anchor "center")
   (box
-   (powerbuttonbox)))
+   (powerbuttonbox)
+  )
+)
   
-
-
 (defwidget powerbuttonbox [] 
   (box :class "powerbuttonbox" 
     :orientation "v"
@@ -181,4 +186,6 @@
     (button :class "widgetbutton" :onclick "reboot" "reboot")
     (button :class "widgetbutton" "log out")
     (button :class "widgetbutton" :onclick "shutdown now" "shutdown")
-    (button :class "widgetbutton" :onclick "eww close power" "exit")))
+    (button :class "widgetbutton" :onclick "eww close power" "exit")
+  )
+)

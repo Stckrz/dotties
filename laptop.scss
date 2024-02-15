@@ -1,0 +1,38 @@
+.sidestuff {
+	border: 3px solid black;
+	border-radius: 4px;
+	font-size: 15px;
+}
+
+.metric{
+	font-size: 15px;
+}
+
+.clock{
+	padding-right: 10px;
+	padding-left: 10px;
+}
+.battery{
+	padding-right: 10px;
+	padding-left: 10px;
+}
+.workspaces{
+	padding: 3px;
+	border: 3px solid black;
+	border-radius: 5px;
+}
+
+.o{
+	padding-right: 9px;
+	padding-left: 9px;
+}
+
+.o11, .o22, .o33, .o44, .o55, .o66, .o77, .o88, .o99{
+	border-radius: 3px;
+}
+
+
+//lsblk
+//lsblk -o name,size,model
+//
+//sudo mount /dev/nvme0n1p3 /mnt/c
