@@ -1,23 +1,43 @@
 (defpoll volume :interval "1s"
   "scripts/getvol"
 )
-
-(defpoll battery :interval "1s"
-  "scripts/getvol"
-)
-
 (defpoll hour :interval "1m"
-  "date \"+%H\""
+  "date \"+%I\""
 )
-
 (defpoll minute :interval "10s"
   "date \"+%M\""
 )
-
 (deflisten workspace
   "scripts/getworkspace"
 )
 
+;; These are the variables for the music player.. 
+(defpoll artist :interval "1s"
+  "playerctl metadata xesam:artist"
+  )
+(defpoll title :interval "1s"
+  "playerctl metadata xesam:title"
+  )
+(defpoll status :interval "1s"
+  "playerctl status"
+  )
+(defpoll length :interval "1s"
+  "playerctl metadata mpris:length"
+  )
+(defpoll position :interval "1s"
+  "playerctl position --format '{{ position }}'"
+  )
+(defpoll humanlength :interval "1s"
+  "playerctl metadata --format '{{ duration(mpris:length) }}'"
+  )
+(defpoll humanposition :interval "1s"
+  "playerctl position --format '{{ duration(position) }}'"
+  )
+(defpoll artUrl :interval "1s"
+  "scripts/getalbumart"
+  )
+
+;; These are really simple, the widgets for system info, etc..
 
 (defwidget volume_slider []
   (box :orientation "h" 
@@ -28,7 +48,7 @@
       :min 0 
       :max 101 
       :value volume 
-      :onchange "amixer sset 'Master' {}%"
+      :onchange "pactl set-sink-volume 1 {}%"
     )
   )
 )
@@ -52,15 +72,16 @@
   )
 )
 
-(defwidget battery_info []
-  (box :orientation "h" 
-       :class "metric battery" 
-       :space-evenly true 
-    (box :class "label battery" "")
-    (box battery)
-  )
-)
+;; (defwidget battery_info []
+;;   (box :orientation "h" 
+;;        :class "metric battery" 
+;;        :space-evenly true 
+;;     (box :class "label battery" "")
+;;     (box battery)
+;;   )
+;; )
 
+;; The clock widget
 (defwidget time []
   (box :orientation "h" 
        :class "metric time" 
@@ -75,11 +96,12 @@
   )
 )
 
+;; The widget on the right with system info, clock, etc... 
 (defwidget sidestuff []
   (box :class "sidestuff" :orientation "h" 
     :space-evenly false
     :halign "end"
-    (battery_info)
+    ;; (battery_info)
     (volume_slider)
     (cpu_info)
     (memory_info)
@@ -89,29 +111,42 @@
        :space-evenly false
        :valign "center"
        :halign "center"
-     (button :class "powerbutton" :onclick "eww open power" "󰐥")
+     (button :class "powerbutton" 
+             :onclick "eww open powerstuff && eww open volumestuff && eww open bigmusic && eww open shortcuts" 
+             "󰐥"
+     )
    )
   )
 )
 
-(defwidget widgetbutton [label value onclick]
-  (box :orientation "v"
-      :class "widgetbutton"
-      :space-evenly true
-      :valign: "center"
-    (box :class "label" label)
-  )
-)
-  
+;; The workspace widget. The code for this can be found in the script that returns its literal "getworkspaces"
 (defwidget workspaces []
  (literal :content workspace)
 )
 
+;; The music widget in the taskbar
+(defwidget music []
+  (box :visible {status == "" ? false : true} :class "musicbox" :halign "center" :space-evenly false :spacing 10
+    (image :image-width 40 :path artUrl)
+    (box :class "musicinfo" :orientation "v" 
+      (box :class "mediastring" :halign "start" title)
+      (box  :class "mediastring" artist)
+    )
+    (box :class "mediacontrol" :width "150":orientation "v"
+      (box
+        (button :class "mediabutton" :onclick "playerctl previous" "󰒮")
+        (button :class "mediabutton" :onclick "playerctl play-pause" {status == "Paused" ?  "󰐊": "󰏤" })
+        (button :class "mediabutton" :onclick "playerctl next" "󰒭")
+      )
+    )
+  )
+)
 
+;; This is the overall taskbar window
 (defwindow bar
   :stacking "bg"
   :exclusive true
-  :monitor 0
+  :monitor 1
   :windowtype "dock"
   :geometry (geometry 
                   :x "0%"
@@ -122,70 +157,149 @@
   :reserve (struts :side "top" :distance "4%")
   (box :class "assbox" 
     (workspaces)
+
+    (music)
+
     (sidestuff)
   )
 )
     
   
-
-
-(defwindow homebase
+;; widget for power controls in the pop-up menu
+(defwindow powerstuff
   :stacking "fg"
   :class "homebase"
-  :monitor 0
+  :monitor 1
   :exclusive false
   :windowtipe "dock"
-  :spacing 10
+  :spacing 8
   :geometry (geometry
-             :x "0%"
-             :y "0%"
-             :width "6%"
-             :height "10%"
-             :anchor "center")
-  (box :spacing 20 :class "assbox"
-    (box  :class "ass" "")
-    (box "")
-    (box "")
-    (box "")
+             :x "60%"
+             :y "35%"
+             :width "3%"
+             :height "12%"
+             )
+    (box :spacing 5 :orientation "v"
+      (box (button :onclick "shutdown now" :class "mybutton shutdown" ""))
+      (box (button :onclick "reboot" :class "mybutton reboot" ""))
+      (box (button :onclick "loginctl terminate-user stckr" :class "mybutton logout" ""))
+      (box (button :onclick "systemctl suspend" :class "mybutton sleep" "󰤄"))
+      (box (button :onclick "eww close powerstuff && eww close volumestuff && eww close bigmusic && eww close shortcuts" 
+                   :class "mybutton exit" ""))
+    )
+)
+
+;; these are the widget for volume control in the pop-up menu
+(defwindow volumestuff
+  :stacking "fg"
+  :class "bigvolume"
+  :monitor 1
+  :exclusive false
+  :windowtipe "dock"
+  :spacing 8
+  :geometry (geometry
+             :x "47.8%"
+             :y "55.5%"
+             :width "12%"
+             :height "12%"
+             )
+(bigVolume)
+)
+
+(defwidget bigVolume [] 
+  (box :spacing 5 :space-evenly false :class "volumecontrols" :orientation "v" 
+    (box :class "bigmetric bigVolumeSlider" :space-evenly true :spacing 0 :orientation "h" :height 40 
+      (overlay
+      (scale 
+        :min 0 
+        :max 101 
+        :value volume 
+        :onchange "pactl set-sink-volume 1 {}%"
+        :orientation "h"
+        :flipped false
+      )
+      (box :class "bigvolumeicon" "󰕾")
+      )
+    )
+      (box :class "muteoptions" :orientation "h" :spacing 5
+      (box (checkbox :onchecked "pactl set-sink-mute 1 toggle" 
+                     :onunchecked "pactl set-sink-mute 1 toggle" 
+                     :class "mybutton speakermute mute" "󰝟"))
+      (box (checkbox :onchecked "pactl set-source-mute toggle" 
+                     :onchecked "pactl set-source-mute toggle" 
+                     :class "mybutton micmute mute" "󰍭"))
+      )
   )
 )
 
-(defwidget homebasebox []
-  (box :class "homebasebox"
-    :orientation "v"
-    :spacing 15
-    :space-evenly true
-    :spacing 10
-    )
-  
-)
-  
-
-
-(defwindow power
+;; This is the big music widget in the pop-up menu 
+(defwindow bigmusic
+  :stacking "fg"
+  :class "bigmusicwindow"
   :monitor 1
   :exclusive false
   :windowtype "dock"
+  :spacing 8
   :geometry (geometry
-             :x "0%"
-             :y "0%"
-             :width "100%"
-             :height "100%"
-             :anchor "center")
-  (box
-   (powerbuttonbox)
+             :x "37.5%"
+             :y "35.1%"
+             :width "3%"
+             :height "10%"
+             )
+  (box :width 500 :height 295 :class "bigmusic" :space-evenly false 
+    (box :width 0 :height 0 :space-evenly false :visible {status == "" ? false : true}
+      (image :valign "center" :halign "start" :class "artimg" :path artUrl :image-width 200)
+      (box :orientation "v" :space-evenly false :valign "center"
+        (box :class "musicinfo" :orientation "v" :space-evenly false 
+          (box :class "mediastring" title)
+          (box  :class "mediastring" artist)
+        )
+        (box :class "mediacontrol" :width "150":orientation "v"
+          (box
+            (button :class "mediabutton" :onclick "playerctl previous" "󰒮")
+            (button :class "mediabutton" :onclick "playerctl play-pause" {status == "Paused" ? "󰐊" : "󰏤"})
+            (button :class "mediabutton" :onclick "playerctl next" "󰒭")
+          )
+          (box :class "musicprogress" :halign "center" :space-evenly false
+            (box :class "musicprogresstext" humanposition)
+            (scale :class "musicprogress" :orientation "h" :max length :value position)
+            (box :class "musicprogresstext" humanlength)
+            )
+        )
+      )
+    )
+    (box :width 500 :height 295 :valign "center" :halign "center" :space-evenly true :visible {status == "" ? true : false} 
+      (button  :width 400 :height 285 :onclick "chromium www.spotify.com" :halign "center" :valign "center" :class "spotify" ""))
   )
 )
-  
-(defwidget powerbuttonbox [] 
-  (box :class "powerbuttonbox" 
-    :orientation "v"
-    :spacing 15
-      :space-evenly true
-      :spacing 10
-    (button :class "widgetbutton" :onclick "reboot" "reboot")
-    (button :class "widgetbutton" "log out")
-    (button :class "widgetbutton" :onclick "shutdown now" "shutdown")
-    (button :class "widgetbutton" :onclick "eww close power" "exit")
+
+
+
+
+;; Window for the shortcuts in the pop-up menu
+(defwindow shortcuts
+  :stacking "fg"
+  :class "shortcutswindow"
+  :monitor 1
+  :exclusive false
+  :windowtype "dock"
+  :spacing 8
+  :geometry (geometry
+             :x "37.5%"
+             :y "56.9%"
+             :width "3%"
+             :height "10%"
+             )
+  (box :width 255 :height 180 :class "shortcutswindow" :space-evenly true :orientation "v" :spacing 8
+    (box :class "shortcutbox" :spacing 5
+      (button :onclick "discord" :class "shortcut discord" "󰙯")
+      (button :onclick "chromium www.github.com" :class "shortcut github" "󰊤")
+      (button :onclick "thunar ~/Pictures/Screenshots &" :class "shortcut screenshots" "")
+    )
+    (box :class "shortcutbox" :spacing 5
+      (button :onclick "chromium www.messages.google.com/web" :class "shortcut messages" "󰊭")
+      (button :class "shortcut" "")
+      (button :onclick "pavucontrol &" :class "shortcut pavu" "󱀞")
+    )
   )
-)
+) 

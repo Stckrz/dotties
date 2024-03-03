@@ -1,12 +1,14 @@
 #!/bin/sh
 
-if command -v pamixer &>/dev/null; then
-    if [ true == $(pamixer --get-mute) ]; then
-        echo 0
-        exit
-    else
-		amixer sget Master | grep -oP '(?<=\[)(\d+)'
-    fi
-else
-	amixer sget Master | grep -oP '(?<=\[)(\d+)'
-fi
+# if command -v pamixer &>/dev/null; then
+#     if [ true == $(pamixer --get-mute) ]; then
+#         echo 0
+#         exit
+#     else
+# 		pactl get-sink-volume 1 | grep -oP 'left:\s\d+\s/\s\s\d+' | grep -oP '(?<=/\s\s)(\d+)'
+# else
+		# pamixer --get-volume
+		pactl get-sink-volume 1 | grep -oP 'left:\s\d+\s/\s\s\d+' | grep -oP '(?<=/\s\s)(\d+)'
+# fi
+
+

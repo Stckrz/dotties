@@ -2,6 +2,7 @@
 	border: 4px solid black;
 	border-radius: 15px;
 	font-size: 23px;
+	padding: 1px;
 }
 
 .metric{
@@ -19,7 +20,7 @@
 	border-radius: 10px;
 }
 
-o{
+.o{
 	padding-right: 13px;
 	padding-left: 13px;
 	padding-top: 5px;
@@ -33,3 +34,64 @@ o{
 .widgetbutton{
 	font-size: 30px;
 }
+
+.powerbutton{
+	font-size: 25px;
+	margin-bottom: 1px;
+}
+
+.shutdown{
+	padding-right: 25px;
+}
+
+.logout{
+	padding-left: 25px;
+}
+
+.mybutton{
+	font-size: 50px;
+	padding: 15px;
+	border-radius: 15px;
+	border: 4px solid black;
+}
+
+.volumecontrols{
+	padding-top: 2px;
+}
+.muteoptions{
+	padding-top: 1px;
+	padding-bottom: 1px;
+}
+.bigVolumeSlider{
+	font-size: 45px;
+}
+.bigvolumeicon{
+	padding-left: 0px;
+	padding-right: 200px;
+	border: 5px solid black;
+	border-radius: 14px;
+}
+
+.bigmetric{
+	font-weight: bold;
+	color: black;
+	border-radius: 25px;
+}
+
+.bigmetric scale trough highlight {
+	all: unset;
+	background-color: #C6A0F6;
+	color: #000000;
+	border-radius: 15px;
+	padding-top: 50px;
+	padding-bottom: 45px;
+	padding-left: 4px;
+	padding-right: 4px;
+}
+
+.bigmetric scale trough {
+	all: unset;
+	background-color: #494d64;
+	border-radius: 15px;
+}
+
